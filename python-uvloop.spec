@@ -3,7 +3,7 @@
 # NOTE Tests are flaky, disabled for abf
 
 Name:		python-uvloop
-Version:	0.22.1
+Version:	0.23.0
 Release:	1
 Summary:	Fast implementation of asyncio event loop on top of libuv
 License:	MIT AND Apache-2.0
@@ -13,15 +13,13 @@ Source0:	https://files.pythonhosted.org/packages/source/u/%{module}/%{module}-%{
 
 BuildSystem:	python
 BuildRequires:	pkgconfig
-BuildRequires:	pkgconfig(python)
+BuildRequires:	pkgconfig(python3)
 BuildRequires:	pkgconfig(libuv)
-BuildRequires:	python%{pyver}dist(aiohttp)
 BuildRequires:	python%{pyver}dist(cython)
 BuildRequires:	python%{pyver}dist(pip)
-BuildRequires:	python%{pyver}dist(pyopenssl)
-BuildRequires:	python%{pyver}dist(psutil)
 BuildRequires:	python%{pyver}dist(setuptools)
 BuildRequires:	python%{pyver}dist(wheel)
+# aiohttp, pyopenssl and psutil are only imported by the test suite.
 %if %{with tests}
 BuildRequires:	python%{pyver}dist(pluggy)
 BuildRequires:	python%{pyver}dist(pytest)
@@ -41,6 +39,8 @@ rm -rf %{module}.egg-info
 sed -i -e "/self.cython_always/s/False/True/" setup.py
 # use system libuv
 sed -i -e "/self.use_system_libuv/s/False/True/" setup.py
+# Cooker Cython is 3.3. The ~=3.1 pin rejects it.
+sed -i -e 's/Cython~=/Cython>=/' setup.py
 # no 3rd-party stuff
 rm -vrf vendor/
 # remove linter from deps
